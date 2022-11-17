@@ -35,7 +35,7 @@ export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response
   const { cep } = req.query as Record<string, string>;
 
   try {
-    const { value, error } = cepValidationSchema.validate(cep);
+    const { error } = cepValidationSchema.validate(cep);
     if (error !== undefined) return res.sendStatus(httpStatus.NO_CONTENT);
     const address = await enrollmentsService.getAddressFromCEP(cep);
 
