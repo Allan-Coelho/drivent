@@ -1,17 +1,33 @@
-import { notFoundError } from "@/errors";
-import eventRepository from "@/repositories/event-repository";
-import { exclude } from "@/utils/prisma-utils";
-import dayjs from "dayjs";
+import paymentRepository from "@/repositories/payments-repository";
+import ticketsRepository from "@/repositories/tickets-repository";
+import enrollmentRepository from "@/repositories/enrollment-repository";
+import { ticketNotFound, unauthorizedUser } from "./errors";
 
-async function getTicketsTypes(): Promise {
-  const event = await eventRepository.findFirst();
-  if (!event) throw notFoundError();
+async function getPaymentByTicketId(ticketId: number, userId: number) {
+  const ticket = await ticketsRepository.findTicketById(ticketId);
 
-  return exclude(event, "createdAt", "updatedAt");
+  if (ticket === null) throw ticketNotFound();
+
+  const payment = await paymentRepository.getPaymentByTicketId(ticketId);
+  const enrollment = await enrollmentRepository.findEnrollmentById(ticket.enrollmentId);
+
+  if (enrollment.userId !== userId) throw unauthorizedUser();
+
+  return payment;
+}
+
+async function postPaymentByTicketId(ticketId: number, userId: number) {
+  const ticket = await ticketsRepository.findTicketById(ticketId);
+  if (ticket === null) throw ticketNotFound();
+  const payment = await paymentRepository.getPaymentByTicketId(ticketId);
+  const enrollment = await enrollmentRepository.findEnrollmentById(ticket.enrollmentId);
+  if (enrollment.userId !== userId) throw unauthorizedUser();
+  return payment;
 }
 
 const ticketsService = {
-  getTicketsTypes,
+  getPaymentByTicketId,
+  postPaymentByTicketId,
 };
 
 export default ticketsService;
