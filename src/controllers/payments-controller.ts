@@ -3,6 +3,7 @@ import paymentsService from "@/services/payments-service";
 import { missingTicketId } from "@/services/payments-service/errors";
 import { Response } from "express";
 import httpStatus from "http-status";
+import { PaymentProcess } from "@/protocols";
 
 export async function getPaymentByTicketId(req: AuthenticatedRequest, res: Response) {
   try {
@@ -33,10 +34,19 @@ export async function getPaymentByTicketId(req: AuthenticatedRequest, res: Respo
 export async function postPaymentByTicketId(req: AuthenticatedRequest, res: Response) {
   try {
     const { userId } = req;
-    const { ticketId } = req.body;
-    const payment = paymentsService.postPaymentByTicketId(Number(ticketId), userId);
-    return res.status(httpStatus.OK);
+    const data = req.body as PaymentProcess;
+    const payment = await paymentsService.postPaymentByTicketId(data, userId);
+
+    return res.send(payment);
   } catch (error) {
-    return res.sendStatus(httpStatus.NO_CONTENT);
+    if (error.name === "TicketNotFound") {
+      return res.status(httpStatus.NOT_FOUND).send(error);
+    }
+
+    if (error.name === "UnauthorizedUser") {
+      return res.status(httpStatus.UNAUTHORIZED).send(error);
+    }
+
+    return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
   }
 }

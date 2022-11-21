@@ -1,5 +1,4 @@
 import { AuthenticatedRequest } from "@/middlewares";
-import { ApplicationError } from "@/protocols";
 import ticketsService from "@/services/tickets-service";
 import { Response } from "express";
 import httpStatus from "http-status";
