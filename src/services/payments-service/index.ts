@@ -1,5 +1,5 @@
-import paymentRepository from "@/repositories/payments-repository";
-import ticketsRepository from "@/repositories/tickets-repository";
+import paymentRepository from "@/repositories/payment-repository";
+import ticketsRepository from "@/repositories/ticket-repository";
 import enrollmentRepository from "@/repositories/enrollment-repository";
 import { ticketNotFound, unauthorizedUser } from "./errors";
 import { PaymentProcess, CardDigits } from "@/protocols";

@@ -24,6 +24,8 @@ export async function cleanTickets() {
 }
 
 export async function cleanHotels() {
+  await prisma.booking.deleteMany({});
+  await prisma.room.deleteMany({});
   await prisma.hotel.deleteMany({});
 }
 
